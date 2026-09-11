@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Predictive analytics | {{ app_name }}{% endblock %}
+{% block page %}analytics{% endblock %}
+{% block content %}
+<section class="page-heading compact"><div><p class="eyebrow">Time-based parking estimate</p><h1>Plan before leaving.</h1><p>This estimate combines the current confirmed availability with approved community updates made at similar times over the past 21 days.</p></div></section>
+<section class="analytics-layout">
+  <form id="prediction-form" class="prediction-form" aria-describedby="prediction-description">
+    <h2>Check availability likelihood</h2><p id="prediction-description" class="muted">Choose a location and hour. This is an estimate, not a reservation.</p>
+    <label>Parking location<select name="location_id" required>{% for location in locations %}<option value="{{ location.id }}">{{ location.name }} — {{ location.city }}</option>{% endfor %}</select></label>
+    <label>Hour of day (24-hour time)<input name="hour" type="number" min="0" max="23" value="{{ current_hour }}" required></label>
+    <button class="button primary" type="submit">Check estimate</button>
+  </form>
+  <section id="prediction-result" class="prediction-result" aria-live="polite"><p class="muted">Your availability estimate will appear here.</p></section>
+</section>
+{% endblock %}

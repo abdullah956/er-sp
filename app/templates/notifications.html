@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Alerts | {{ app_name }}{% endblock %}
+{% block page %}notifications{% endblock %}
+{% block content %}
+<section class="page-heading compact"><div><p class="eyebrow">Notifications and alerts</p><h1>Keep up with your updates.</h1><p>See when your parking reports are reviewed and when an assistance request has been resolved.</p></div>{% if notifications %}<form method="post" action="/notifications/read"><button class="button secondary" type="submit">Mark all as read</button></form>{% endif %}</section>
+{% if notifications %}
+<div class="notification-list">{% for notification in notifications %}<article class="notification-item {% if not notification.is_read %}unread{% endif %}"><div><span class="status-badge {% if notification.is_read %}resolved{% else %}pending{% endif %}">{{ 'read' if notification.is_read else 'new' }}</span><h2>{{ notification.title }}</h2><p>{{ notification.message }}</p><small>{{ notification.created_at.strftime('%d %b %Y, %H:%M') }}</small></div></article>{% endfor %}</div>
+{% else %}<section class="panel empty-panel"><h2>No alerts yet</h2><p class="muted">Report-review and assistance-request updates will appear here.</p></section>{% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | {{ app_name }}{% endblock %}
+{% block page %}dashboard{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">Driver dashboard</p><h1>Good to see you, {{ user.full_name.split(' ')[0] }}.</h1><p>Check current availability, submit a community update, or plan your best time to leave.</p></div>
+  <a class="button primary" href="/map">Find parking</a>
+</section>
+<section class="metrics" aria-label="Your Smart Park summary">
+  <article><span class="metric-label">Reward points</span><strong>{{ user.reward_points }}</strong><small>{{ reward_badge }} badge</small></article>
+  <article><span class="metric-label">Saved locations</span><strong>{{ favorite_locations|length }}</strong><small>quickly return to your frequent places</small></article>
+  <article><span class="metric-label">Accessibility profile</span><strong>{% if user.assistance_needs %}Saved{% else %}Not set{% endif %}</strong><small>update your needs in your profile</small></article>
+  <article><span class="metric-label">Community rank</span><strong>#{{ community_rank }}</strong><small>based on approved reward points</small></article>
+</section>
+<section class="content-section">
+  <div class="section-title"><div><p class="eyebrow">Live parking data</p><h2>Parking availability</h2></div><a href="/map">Open interactive map →</a></div>
+  <div class="location-grid">
+  {% for location in locations %}
+    <article class="location-card {{ location.color }}">
+      <div class="location-top"><span class="availability-dot {{ location.color }}"></span><span>{{ location.city }}</span>{% if location.is_accessible %}<span class="accessible-tag">Accessible</span>{% endif %}</div>
+      <h3>{{ location.name }}</h3><p>{{ location.address }}</p>
+      <div class="availability-row"><strong>{{ location.available_spots }} of {{ location.total_spots }}</strong><span>spaces available</span></div>
+      <div class="card-actions"><a class="button secondary" href="/map">View map</a><a class="text-link" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination={{ location.latitude }},{{ location.longitude }}">Directions</a></div>
+    </article>
+  {% endfor %}
+  </div>
+</section>
+{% if favorite_locations %}
+<section class="content-section compact-section">
+  <div class="section-title"><div><p class="eyebrow">Your profile</p><h2>Favourite places</h2></div><a href="/profile">Manage profile →</a></div>
+  <div class="simple-list">{% for location in favorite_locations %}<a href="/map" class="simple-list-item"><span>★</span><span><strong>{{ location.name }}</strong><small>{{ location.city }} · {{ location.available_spots }} spaces currently available</small></span><span>→</span></a>{% endfor %}</div>
+</section>
+{% endif %}
+{% if leaderboard %}
+<section class="content-section compact-section">
+  <div class="section-title"><div><p class="eyebrow">Community rewards</p><h2>Parking helper rankings</h2></div></div>
+  <div class="simple-list">{% for member in leaderboard %}<div class="simple-list-item static"><span>{{ loop.index }}</span><span><strong>{{ member.full_name }}{% if member.id == user.id %} (You){% endif %}</strong><small>{{ member.reward_points }} points · {{ 'Parking Champion' if member.reward_points >= 50 else 'Community Contributor' if member.reward_points >= 20 else 'Parking Helper' if member.reward_points >= 10 else 'New Contributor' }}</small></span></div>{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

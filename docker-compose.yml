@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart-park-postgres
+    environment:
+      POSTGRES_DB: smartpark
+      POSTGRES_USER: smartpark
+      POSTGRES_PASSWORD: smartpark_dev_password
+    ports:
+      - "${SMART_PARK_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - smart_park_postgres:/var/lib/postgresql/data
+
+volumes:
+  smart_park_postgres:

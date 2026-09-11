@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Admin | {{ app_name }}{% endblock %}
+{% block page %}admin{% endblock %}
+{% block content %}
+<section class="page-heading compact"><div><p class="eyebrow">Administrator area</p><h1>Manage Smart Park data.</h1><p>Review community updates, manage users and parking records, and monitor assistance requests.</p></div></section>
+<section class="admin-stats"><article><strong>{{ users|length }}</strong><span>registered users</span></article><article><strong>{{ reports|selectattr('validation_status.value', 'equalto', 'pending')|list|length }}</strong><span>pending reports</span></article><article><strong>{{ locations|length }}</strong><span>parking locations</span></article><article><strong>{{ assistance_requests|selectattr('status.value', 'equalto', 'open')|list|length }}</strong><span>open assistance requests</span></article></section>
+
+<section class="admin-section analytics-summary"><div class="section-title"><div><p class="eyebrow">System analytics and reports</p><h2>Current platform summary</h2></div></div><div><article><strong>{{ analytics.active_users }}</strong><span>active user accounts</span></article><article><strong>{{ analytics.total_reports }}</strong><span>community reports submitted</span></article><article><strong>{{ analytics.approved_reports }}</strong><span>approved availability updates</span></article><article><strong>{{ analytics.available_spaces }} / {{ analytics.total_spaces }}</strong><span>spaces currently available</span></article></div></section>
+
+<section class="admin-section">
+  <div class="section-title"><div><p class="eyebrow">Community data</p><h2>Validate parking reports</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Submitted</th><th>Driver</th><th>Location</th><th>Status reported</th><th>Note</th><th>Validation</th><th>Action</th></tr></thead><tbody>
+  {% for report in reports %}<tr><td>{{ report.created_at.strftime('%d %b %H:%M') }}</td><td>{{ report.reporter.full_name }}</td><td>{{ report.location.name }}</td><td><span class="status-badge {{ report.reported_status.value }}">{{ report.reported_status.value }}</span></td><td>{{ report.note or '—' }}</td><td><span class="status-badge {{ report.validation_status.value }}">{{ report.validation_status.value }}</span></td><td>{% if report.validation_status.value == 'pending' %}<form class="inline-actions" method="post" action="/admin/reports/{{ report.id }}"><button class="button small primary" type="submit" name="action" value="approve">Approve</button><button class="button small danger" type="submit" name="action" value="reject">Reject</button></form>{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+</section>
+
+<section class="admin-section two-columns">
+  <div class="panel"><p class="eyebrow">System setting</p><h2>Report validation</h2><form method="post" action="/admin/settings" class="stack-form"><label class="checkbox-row"><input type="checkbox" name="auto_approve" {% if auto_approve %}checked{% endif %}> Automatically approve community reports</label><p class="muted">When off, only an approved report changes parking availability and adds reward points.</p><button class="button secondary" type="submit">Save setting</button></form></div>
+  <div class="panel"><p class="eyebrow">Accessibility support</p><h2>Assistance requests</h2>{% if assistance_requests %}<div class="admin-request-list">{% for request in assistance_requests %}<div><span><strong>{{ request.user.full_name }}</strong><small>{{ request.location.name if request.location else 'General request' }} · {{ request.details }}</small></span><span>{% if request.status.value == 'open' %}<form method="post" action="/admin/assistance/{{ request.id }}/resolve"><button class="button small secondary" type="submit">Resolve</button></form>{% else %}<span class="status-badge resolved">resolved</span>{% endif %}</span></div>{% endfor %}</div>{% else %}<p class="empty-state">No assistance requests have been submitted.</p>{% endif %}</div>
+</section>
+
+<section class="admin-section">
+  <div class="section-title"><div><p class="eyebrow">Accounts</p><h2>Manage users</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Points</th><th>Account</th><th>Action</th></tr></thead><tbody>{% for account in users %}<tr><td>{{ account.full_name }}</td><td>{{ account.email }}</td><td>{{ account.role.value }}</td><td>{{ account.reward_points }}</td><td><span class="status-badge {% if account.is_active %}approved{% else %}rejected{% endif %}">{{ 'active' if account.is_active else 'inactive' }}</span></td><td>{% if account.id != user.id %}<form method="post" action="/admin/users/{{ account.id }}/toggle"><button class="button small secondary" type="submit">{{ 'Deactivate' if account.is_active else 'Activate' }}</button></form>{% else %}Current account{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+</section>
+
+<section class="admin-section">
+  <div class="section-title"><div><p class="eyebrow">Map information</p><h2>Manage parking locations and spaces</h2></div></div>
+  <form method="post" action="/admin/locations" class="admin-add-location">
+    <label>Name<input name="name" required></label><label>City<input name="city" required></label><label>Address<input name="address" required></label><label>Latitude<input name="latitude" type="number" step="any" required></label><label>Longitude<input name="longitude" type="number" step="any" required></label><label>Description<input name="description"></label><label class="checkbox-row"><input name="is_accessible" type="checkbox"> Accessible</label><button class="button primary" type="submit">Add location</button>
+  </form>
+  <div class="location-management">
+  {% for location in locations %}
+    <details class="location-editor"><summary><span><strong>{{ location.name }}</strong><small>{{ location.city }} · {{ location.spots|length }} spaces</small></span><span>Manage ›</span></summary>
+      <div class="editor-body">
+        <form method="post" action="/admin/locations/{{ location.id }}" class="admin-location-form"><label>Name<input name="name" value="{{ location.name }}" required></label><label>City<input name="city" value="{{ location.city }}" required></label><label>Address<input name="address" value="{{ location.address }}" required></label><label>Latitude<input name="latitude" type="number" step="any" value="{{ location.latitude }}" required></label><label>Longitude<input name="longitude" type="number" step="any" value="{{ location.longitude }}" required></label><label>Description<input name="description" value="{{ location.description or '' }}"></label><label class="checkbox-row"><input name="is_accessible" type="checkbox" {% if location.is_accessible %}checked{% endif %}> Accessible</label><button class="button small secondary" type="submit">Save location</button></form>
+        <form method="post" action="/admin/locations/{{ location.id }}/delete" class="delete-form"><button class="button small danger" type="submit">Remove location</button></form>
+        <div class="spot-management"><h3>Parking spaces</h3><div class="spot-list">{% for spot in location.spots %}<div class="spot-editor"><strong>{{ spot.label }}</strong><form method="post" action="/admin/spots/{{ spot.id }}"><select name="spot_status">{% for value in ['available', 'occupied', 'issue'] %}<option value="{{ value }}" {% if spot.status.value == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select><label class="checkbox-row"><input name="is_accessible" type="checkbox" {% if spot.is_accessible %}checked{% endif %}> Accessible</label><button class="button small secondary" type="submit">Save</button></form><form method="post" action="/admin/spots/{{ spot.id }}/delete"><button class="button small danger" type="submit">Remove</button></form></div>{% endfor %}</div>
+          <form method="post" action="/admin/locations/{{ location.id }}/spots" class="add-spot-form"><label>New space label<input name="label" placeholder="e.g. S-7" required></label><label>Status<select name="spot_status"><option value="available">available</option><option value="occupied">occupied</option><option value="issue">issue</option></select></label><label class="checkbox-row"><input name="is_accessible" type="checkbox"> Accessible</label><button class="button small primary" type="submit">Add space</button></form>
+        </div>
+      </div>
+    </details>
+  {% endfor %}
+  </div>
+</section>
+{% endblock %}

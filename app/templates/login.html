@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Log in | {{ app_name }}{% endblock %}
+{% block page %}login{% endblock %}
+{% block content %}
+<section class="auth-layout">
+  <div class="auth-hero">
+    <a class="brand light" href="/login"><span class="brand-mark">P</span><span>Smart<span>Park</span></span></a>
+    <p class="eyebrow">Kuwait Smart Park</p>
+    <h1>Find parking with less uncertainty.</h1>
+    <p>Search community-updated parking availability in Kuwait City, Salmiya, and Mubarakiya before you arrive.</p>
+    <ul class="feature-list"><li>Live colour-coded availability</li><li>Time-based parking estimates</li><li>Quick directions in Google Maps</li></ul>
+  </div>
+  <section class="auth-card" aria-labelledby="login-title">
+    <p class="eyebrow">Welcome back</p>
+    <h2 id="login-title">Log in to your profile</h2>
+    <p class="muted">Use your Smart Park account to save places and contribute updates.</p>
+    <form method="post" action="/login" class="stack-form">
+      <label>Email address<input type="email" name="email" autocomplete="email" required></label>
+      <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="button primary" type="submit">Log in</button>
+    </form>
+    <p class="auth-switch">New to Smart Park? <a href="/register">Create an account</a></p>
+  </section>
+</section>
+{% endblock %}

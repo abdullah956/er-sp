@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Create account | {{ app_name }}{% endblock %}
+{% block page %}register{% endblock %}
+{% block content %}
+<section class="auth-layout">
+  <div class="auth-hero">
+    <a class="brand light" href="/login"><span class="brand-mark">P</span><span>Smart<span>Park</span></span></a>
+    <p class="eyebrow">Join the community</p>
+    <h1>Park smarter in Kuwait.</h1>
+    <p>Share reliable parking updates, keep your favourite areas close, and plan ahead with availability estimates.</p>
+  </div>
+  <section class="auth-card" aria-labelledby="register-title">
+    <p class="eyebrow">Create your account</p>
+    <h2 id="register-title">Get started</h2>
+    <p class="muted">Your password must have at least 8 characters.</p>
+    <form method="post" action="/register" class="stack-form">
+      <label>Full name<input type="text" name="full_name" autocomplete="name" minlength="2" required></label>
+      <label>Email address<input type="email" name="email" autocomplete="email" required></label>
+      <label>Password<input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
+      <button class="button primary" type="submit">Create account</button>
+    </form>
+    <p class="auth-switch">Already registered? <a href="/login">Log in</a></p>
+  </section>
+</section>
+{% endblock %}

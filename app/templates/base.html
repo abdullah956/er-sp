@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kuwait Smart Park helps drivers find community-updated parking availability.">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body data-page="{% block page %}{% endblock %}">
+  {% if user %}
+  <header class="site-header">
+    <a class="brand" href="/dashboard" aria-label="Kuwait Smart Park home"><span class="brand-mark">P</span><span>Smart<span>Park</span></span></a>
+    <nav aria-label="Primary navigation">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/map">Find parking</a>
+      <a href="/analytics">Predictive analytics</a>
+      <a href="/notifications">Alerts</a>
+      <a href="/profile">Profile</a>
+      {% if user.role.value == 'admin' %}<a href="/admin">Admin</a>{% endif %}
+    </nav>
+    <div class="account-menu"><span>Hello, {{ user.full_name }}</span><form action="/logout" method="post"><button class="link-button" type="submit">Log out</button></form></div>
+  </header>
+  {% endif %}
+  <main class="{% if user %}app-main{% else %}auth-main{% endif %}">
+    {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+    {% if message %}<div class="notice success" role="status">{{ message }}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{{ url_for('static', path='app.js') }}" defer></script>
+</body>
+</html>

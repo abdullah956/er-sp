@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Find parking | {{ app_name }}{% endblock %}
+{% block page %}map{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ6kCkCFx6M+F7A5k7YbKIL6g0F0rN0=" crossorigin=""><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>{% endblock %}
+{% block content %}
+<section class="page-heading compact"><div><p class="eyebrow">Live colour-coded map</p><h1>Find a parking location.</h1><p>Green means more spaces are available; orange means limited; red means full or unavailable.</p></div></section>
+<section class="map-layout">
+  <aside class="map-sidebar">
+    <label class="search-label" for="location-search">Search a destination or area</label>
+    <input id="location-search" type="search" placeholder="e.g. Salmiya or Mubarakiya" autocomplete="off">
+    <label class="checkbox-row"><input id="accessible-filter" type="checkbox"> Accessible parking only</label>
+    <div class="legend" aria-label="Parking availability legend"><span><i class="availability-dot green"></i>Available</span><span><i class="availability-dot orange"></i>Limited</span><span><i class="availability-dot red"></i>Full / unavailable</span></div>
+    <div id="location-results" class="map-results" aria-live="polite"></div>
+  </aside>
+  <div class="map-wrap"><div id="parking-map" aria-label="Interactive parking map"></div><div id="map-fallback" class="map-fallback" hidden>Map tiles could not be loaded. You can still search the parking locations from the list.</div></div>
+  <aside id="location-detail" class="location-detail" aria-live="polite"><p class="muted">Select a parking location from the map or list to see availability and directions.</p></aside>
+</section>
+<section class="report-section" aria-labelledby="report-title">
+  <div><p class="eyebrow">Community reporting</p><h2 id="report-title">Share what you see</h2><p>Reports are reviewed by an administrator before they update the live map and earn reward points.</p></div>
+  <form id="report-form" class="report-form">
+    <label>Parking location<select id="report-location" name="location_id" required><option value="">Choose a location</option>{% for location in locations %}<option value="{{ location.id }}">{{ location.name }}</option>{% endfor %}</select></label>
+    <label>Status<select name="reported_status" required><option value="available">Open space available</option><option value="occupied">Parking is occupied</option><option value="issue">Parking issue</option></select></label>
+    <label>Optional note<input type="text" name="note" maxlength="300" placeholder="Briefly describe what you noticed"></label>
+    <button class="button primary" type="submit">Submit report</button>
+    <p id="report-feedback" class="form-feedback" role="status"></p>
+  </form>
+</section>
+{% endblock %}
